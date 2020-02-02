@@ -1,7 +1,7 @@
 const fs= require('fs');
 const path= require('path');
 const express= require('express');
-
+const {accounts, users, writeJSON} =require('./data');
 const app= express();
 
 
@@ -12,13 +12,13 @@ app.use(express.static(path.join(__dirname,'public')));
 
 app.use(express.urlencoded({extended: true }));
 
-
+/*
 const accountData= fs.readFileSync(path.join(__dirname,'json','accounts.json'),'utf8');
 const accounts=JSON.parse(accountData);
 
 const userData= fs.readFileSync(path.join(__dirname,'json','users.json'),'utf8');
 const users=JSON.parse(userData);
-
+*/
 
 app.get('/', (request, response) =>{
     response.render('index', {title:'Account Summary', accounts})
@@ -47,10 +47,15 @@ app.get('/transfer', (request, response) =>{
 
 app.post('/transfer', (request, response) => {
    accounts[request.body.from].balance=  parseInt(accounts[request.body.from].balance) -  parseInt(request.body.amount);
- //accounts[request.body.to].balance=   parseInt(request.body.amount, 10);
    accounts[request.body.to].balance= parseInt(accounts[request.body.to].balance) + parseInt(request.body.amount,10);
- const accountsJSON= JSON.stringify(accounts,null,4);
+  
+   /*
+   const accountsJSON= JSON.stringify(accounts,null,4);
    fs.writeFileSync(path.join(__dirname,'json/accounts.json'),accountsJSON,'utf8');
+*/
+
+    writeJSON();
+
    response.render('transfer', {message: "Transfer Completed"});
 })
 
@@ -64,11 +69,11 @@ app.get('/payment', (request, response)=>{
 app.post('/payment', (request, response)=>{
     accounts.credit.balance=accounts.credit.balance-request.body.amount;
     accounts.credit.available= parseInt(accounts.credit.available) + parseInt(request.body.amount, 10);
-
+/*
     accountsJSON= JSON.stringify(accounts,null,4);
-
     fs.writeFileSync(path.join(__dirname,'json/accounts.json'),accountsJSON,'utf8');
-
+*/
+    writeJSON();
     response.render('payment',{ message: "Payment Successful", account: accounts.credit });
 })
 app.listen(3000, ()=>{ console.log("PS Project Running on port 3000!")});
